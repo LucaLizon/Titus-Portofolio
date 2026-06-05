@@ -1,4 +1,32 @@
-// --- Liste des images (garde tes imports tels quels) ---
+import imgA431 from "../../imports/VTelephone4/2a2a2de204eab3316c33b7556486073ff120da1f.png";
+import imgCateringBanquetteACLentreue1 from "../../imports/VTelephone4/3b88f460ac3bfd802f99a686ca6f56673d4aed64.png";
+import imgCateringDeutailBanquette1 from "../../imports/VTelephone4/30ad168737b8827e2124ca386cbb39c6fdf3dc60.png";
+import imgImage02Chambre1 from "../../imports/VTelephone4/bd8a42e2e341f2fd960778e7ca17d27fffe3a06e.png";
+import imgVuePasserelleExt011 from "../../imports/VTelephone4/da98673997b8e5696a45ac9c71dd7751b87ae711.png";
+
+import imgCateringBanquetteEntree from "../../imports/VTelephone4/Catering__Banquette_a___l_entre__e.jpg";
+import imgCateringDetailBanquette from "../../imports/VTelephone4/Catering__De__tail_banquette.jpg";
+import imgCateringDetailCuisine from "../../imports/VTelephone4/Catering__Detail_cuisine.jpg";
+import imgCateringCuisineVue from "../../imports/VTelephone4/Catering_Cuisine_vue_d_ensemble.jpg";
+import img3DZoneRestauration from "../../imports/VTelephone4/3D_Zone-restauration.PNG";
+import imgA43 from "../../imports/VTelephone4/A4.3.png";
+import imgSalleDeBain from "../../imports/VTelephone4/Image01_Salle-de-bain.jpg";
+import imgChambre from "../../imports/VTelephone4/Image02-Chambre.png";
+import img3DSequence01 from "../../imports/VTelephone4/3D_Se__quence01.png";
+import img3DSequence02 from "../../imports/VTelephone4/3D_Se__quence02.png";
+import img3DSequence03 from "../../imports/VTelephone4/3D_Se__quence03.png";
+import imgArriveeEtage from "../../imports/VTelephone4/Arrive__e_a___l_e__tage.jpg";
+import imgCuisine01 from "../../imports/VTelephone4/Cuisine01_002.jpg";
+import imgCuisine02 from "../../imports/VTelephone4/Cuisine02.jpg";
+import imgSDBParentale02 from "../../imports/VTelephone4/SDB_parentale_02.jpg";
+import imgSDBParentale000 from "../../imports/VTelephone4/SDB_parentale_000.jpg";
+import imgSuiteParentale from "../../imports/VTelephone4/Suite_parentale.jpg";
+import imgVuePasserelle01 from "../../imports/VTelephone4/Vue_passerelle_ext01.jpg";
+import imgVuePasserelle02 from "../../imports/VTelephone4/Vue_passerelle_ext02.jpg";
+import imgVuePasserelle03 from "../../imports/VTelephone4/Vue_passerelle_ext03.jpg";
+import imgVueCouloir from "../../imports/VTelephone4/Vue_sur_le_couloir.jpg";
+import imgVueSallePoly from "../../imports/VTelephone4/Vue_sur_salle_poly_000.jpg";
+import imgVueVasque from "../../imports/VTelephone4/Vue_sur_vasque_parentale.jpg";
 const sources = [
   { src: imgA431, alt: "Architecture project" },
   { src: imgCateringBanquetteEntree, alt: "Catering Banquette" },
