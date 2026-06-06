@@ -4,6 +4,8 @@ import svgPathsLarge from "../../imports/VTelephone1/svg-81nbe11cn7";
 interface AnimatedHeaderProps {
   scrollY: number;
   heroHeight: number;
+  onScrollTop: () => void;
+  onMenuOpen: () => void;
 }
 
 function useNow() {
@@ -19,7 +21,7 @@ function pad(n: number) {
   return String(n).padStart(2, '0');
 }
 
-export function AnimatedHeader({ scrollY, heroHeight }: AnimatedHeaderProps) {
+export function AnimatedHeader({ scrollY, heroHeight, onScrollTop, onMenuOpen }: AnimatedHeaderProps) {
   const now = useNow();
   const dateStr = `${pad(now.getDate())} ${pad(now.getMonth() + 1)}`;
   const timeStr = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
@@ -40,24 +42,29 @@ export function AnimatedHeader({ scrollY, heroHeight }: AnimatedHeaderProps) {
   const dateHeaderLeft = logoLeft + 67 + 10;
   const dateHeaderTop = 10;
   const dateHeaderOpacity = progress > 0.5 ? ((progress - 0.5) / 0.5) : 0;
-
   const dateBottomOpacity = progress < 0.5 ? (1 - progress * 2) : 0;
-
   const workOpacity = progress > 0.5 ? ((progress - 0.5) / 0.5) : 0;
   const menuTopOpacity = progress < 0.2 ? (1 - progress * 5) : 0;
 
+  // Logo cliquable uniquement quand il est petit (scroll terminé)
+  const logoClickable = progress > 0.9;
+
   return (
     <div className="fixed top-0 left-0 right-0 z-50 w-full max-w-[402px] mx-auto h-screen pointer-events-none">
-      {/* Logo TH - pointer-events-none pour laisser passer le scroll */}
+
+      {/* Logo TH */}
       <div
-        className="absolute pointer-events-none"
+        className="absolute"
         style={{
           left: `${logoLeft}px`,
           top: `${logoTop}px`,
           height: `${logoHeight}px`,
           width: `${logoWidth}px`,
           willChange: 'top, height, width',
+          pointerEvents: logoClickable ? 'auto' : 'none',
+          cursor: logoClickable ? 'pointer' : 'default',
         }}
+        onClick={logoClickable ? onScrollTop : undefined}
       >
         <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 200.999 244.74">
           <path d={svgPathsLarge.p30dfcb00} fill="white" />
@@ -88,9 +95,7 @@ export function AnimatedHeader({ scrollY, heroHeight }: AnimatedHeaderProps) {
       {/* Date/Time en bas à gauche - disparaît au scroll */}
       <div
         className="absolute bottom-[10px] left-[10px] transition-opacity duration-300 pointer-events-none"
-        style={{
-          opacity: dateBottomOpacity,
-        }}
+        style={{ opacity: dateBottomOpacity }}
       >
         <div className="flex flex-col items-start">
           <p className="font-['Roboto:Regular',sans-serif] font-normal leading-[normal] text-[20px] text-white tracking-[-0.2px] whitespace-nowrap" style={{ fontVariationSettings: '"wdth" 100' }}>
@@ -107,7 +112,7 @@ export function AnimatedHeader({ scrollY, heroHeight }: AnimatedHeaderProps) {
         className="absolute top-[10px] right-[10px] h-[101.58px] flex items-center justify-end transition-opacity duration-300 pointer-events-auto"
         style={{ opacity: menuTopOpacity }}
       >
-        <button className="flex items-center justify-center hover:opacity-80 transition-opacity">
+        <button className="flex items-center justify-center" onClick={onMenuOpen}>
           <p className="font-['Roboto:ExtraBold',sans-serif] font-extrabold leading-[normal] text-[20px] text-white tracking-[-0.2px] whitespace-nowrap" style={{ fontVariationSettings: '"wdth" 100' }}>
             Menu +
           </p>
@@ -117,14 +122,14 @@ export function AnimatedHeader({ scrollY, heroHeight }: AnimatedHeaderProps) {
       {/* Header fixe en haut - Work + et Menu + apparaissent au scroll */}
       <div className="absolute top-[10px] right-[10px] flex gap-[20px] items-center h-[101.58px] pointer-events-auto">
         <button
-          className="flex items-center justify-center hover:opacity-80 transition-opacity"
+          className="flex items-center justify-center"
           style={{ opacity: workOpacity }}
         >
           <p className="font-['Roboto:ExtraBold',sans-serif] font-extrabold leading-[normal] text-[20px] text-white tracking-[-0.2px] whitespace-nowrap" style={{ fontVariationSettings: '"wdth" 100' }}>
             Work +
           </p>
         </button>
-        <button className="flex items-center justify-center hover:opacity-80 transition-opacity">
+        <button className="flex items-center justify-center" onClick={onMenuOpen}>
           <p className="font-['Roboto:ExtraBold',sans-serif] font-extrabold leading-[normal] text-[20px] text-white tracking-[-0.2px] whitespace-nowrap" style={{ fontVariationSettings: '"wdth" 100' }}>
             Menu +
           </p>

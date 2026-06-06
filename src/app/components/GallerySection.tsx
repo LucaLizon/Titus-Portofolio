@@ -111,7 +111,7 @@ function buildLayout() {
       width: w,
       height: h,
       position: { top: Math.max(0, top), left },
-      z: Math.floor(rng() * 100),
+      z: Math.floor(rng() * 40),
     };
   });
 }

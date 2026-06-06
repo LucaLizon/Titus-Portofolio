@@ -1,3 +1,21 @@
+@keyframes menuFadeIn {
+  from { opacity: 0; backdrop-filter: blur(0px); }
+  to   { opacity: 1; backdrop-filter: blur(14px); }
+}
+
+@keyframes menuTextIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.menu-overlay {
+  animation: menuFadeIn 0.35s ease-out forwards;
+}
+
+.menu-text {
+  animation: menuTextIn 0.4s ease-out 0.15s both;
+}
+
 @keyframes marquee {
   0% {
     transform: translateX(0);
