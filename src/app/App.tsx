@@ -60,7 +60,9 @@ export default function App() {
         />
         <main className="w-full max-w-[402px] mx-auto">
           <HeroSection scrollY={scrollY} />
-          <GallerySection />
+          <div className="mt-[50px]">
+            <GallerySection />
+          </div>
           <div className="mt-[60px]">
             <NameBanner />
           </div>
