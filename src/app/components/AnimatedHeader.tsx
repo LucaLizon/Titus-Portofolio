@@ -4,8 +4,11 @@ import svgPathsLarge from "../../imports/VTelephone1/svg-81nbe11cn7";
 interface AnimatedHeaderProps {
   scrollY: number;
   heroHeight: number;
+  workOpen: boolean;
+  bottomFade: number; // 0 = logo visible, 1 = logo invisible
   onScrollTop: () => void;
   onMenuOpen: () => void;
+  onWorkToggle: () => void;
 }
 
 function useNow() {
@@ -21,13 +24,22 @@ function pad(n: number) {
   return String(n).padStart(2, '0');
 }
 
-export function AnimatedHeader({ scrollY, heroHeight, onScrollTop, onMenuOpen }: AnimatedHeaderProps) {
+export function AnimatedHeader({
+  scrollY,
+  heroHeight,
+  workOpen,
+  bottomFade,
+  onScrollTop,
+  onMenuOpen,
+  onWorkToggle,
+}: AnimatedHeaderProps) {
   const now = useNow();
   const dateStr = `${pad(now.getDate())} ${pad(now.getMonth() + 1)}`;
   const timeStr = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
 
   const animationEndPoint = heroHeight * 0.7;
-  const progress = Math.min(scrollY / animationEndPoint, 1);
+  // Quand Work est ouvert, forcer progress=1 : logo toujours petit en haut-gauche
+  const progress = workOpen ? 1 : Math.min(scrollY / animationEndPoint, 1);
 
   const startLogoHeight = 244.74;
   const endLogoHeight = 81.58;
@@ -46,38 +58,51 @@ export function AnimatedHeader({ scrollY, heroHeight, onScrollTop, onMenuOpen }:
   const workOpacity = progress > 0.5 ? ((progress - 0.5) / 0.5) : 0;
   const menuTopOpacity = progress < 0.2 ? (1 - progress * 5) : 0;
 
-  // Logo cliquable uniquement quand il est petit (scroll terminé)
-  const logoClickable = progress > 0.9;
+  // Logo cliquable uniquement quand il est petit
+  const logoClickable = progress > 0.9 || workOpen;
+
+  // Fond noir sous le header uniquement dans la section Work
+  const showBlackBg = workOpen;
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 w-full max-w-[402px] mx-auto h-screen pointer-events-none">
+    // z-[120] : au-dessus du WorkSection (z-100) mais sous le MenuOverlay (z-200)
+    <div className="fixed top-0 left-0 right-0 z-[120] w-full max-w-[402px] mx-auto h-screen pointer-events-none">
 
-      {/* Logo TH */}
+      {/* Fond noir derrière le header */}
+      {showBlackBg && (
+        <div
+          className="absolute top-0 left-0 right-0 bg-black pointer-events-none transition-opacity duration-300"
+          style={{ height: '100px', opacity: workOpen ? 1 : Math.min(progress * 10, 1) }}
+        />
+      )}
+
+      {/* Logo TH — s'efface quand la section basse entre dans le viewport */}
       <div
-        className="absolute"
+        className="absolute transition-opacity duration-300"
         style={{
           left: `${logoLeft}px`,
           top: `${logoTop}px`,
           height: `${logoHeight}px`,
           width: `${logoWidth}px`,
           willChange: 'top, height, width',
-          pointerEvents: logoClickable ? 'auto' : 'none',
-          cursor: logoClickable ? 'pointer' : 'default',
+          opacity: workOpen ? 1 : 1 - bottomFade,
+          pointerEvents: logoClickable && bottomFade < 0.5 ? 'auto' : 'none',
+          cursor: logoClickable && bottomFade < 0.5 ? 'pointer' : 'default',
         }}
-        onClick={logoClickable ? onScrollTop : undefined}
+        onClick={logoClickable && bottomFade < 0.5 ? onScrollTop : undefined}
       >
         <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 200.999 244.74">
           <path d={svgPathsLarge.p30dfcb00} fill="white" />
         </svg>
       </div>
 
-      {/* Date/Time en haut à droite du logo - apparaît au scroll */}
+      {/* Date/Time en haut à droite du logo */}
       <div
         className="absolute transition-opacity duration-300 pointer-events-none flex h-[76px] items-center justify-center w-[46px]"
         style={{
           left: `${dateHeaderLeft}px`,
           top: `${dateHeaderTop}px`,
-          opacity: dateHeaderOpacity,
+          opacity: workOpen ? 1 : dateHeaderOpacity * (1 - bottomFade),
         }}
       >
         <div className="flex-none rotate-90">
@@ -92,48 +117,64 @@ export function AnimatedHeader({ scrollY, heroHeight, onScrollTop, onMenuOpen }:
         </div>
       </div>
 
-      {/* Date/Time en bas à gauche - disparaît au scroll */}
-      <div
-        className="absolute bottom-[10px] left-[10px] transition-opacity duration-300 pointer-events-none"
-        style={{ opacity: dateBottomOpacity }}
-      >
-        <div className="flex flex-col items-start">
-          <p className="font-['Roboto:Regular',sans-serif] font-normal leading-[normal] text-[20px] text-white tracking-[-0.2px] whitespace-nowrap" style={{ fontVariationSettings: '"wdth" 100' }}>
-            {dateStr}
-          </p>
-          <p className="font-['Roboto:Regular',sans-serif] font-normal leading-[normal] text-[20px] text-white tracking-[-0.2px] whitespace-nowrap" style={{ fontVariationSettings: '"wdth" 100' }}>
-            {timeStr}
-          </p>
-        </div>
-      </div>
-
-      {/* Menu + en haut à droite - visible au début */}
-      <div
-        className="absolute top-[10px] right-[10px] h-[101.58px] flex items-center justify-end transition-opacity duration-300 pointer-events-auto"
-        style={{ opacity: menuTopOpacity }}
-      >
-        <button className="flex items-center justify-center" onClick={onMenuOpen}>
-          <p className="font-['Roboto:ExtraBold',sans-serif] font-extrabold leading-[normal] text-[20px] text-white tracking-[-0.2px] whitespace-nowrap" style={{ fontVariationSettings: '"wdth" 100' }}>
-            Menu +
-          </p>
-        </button>
-      </div>
-
-      {/* Header fixe en haut - Work + et Menu + apparaissent au scroll */}
-      <div className="absolute top-[10px] right-[10px] flex gap-[20px] items-center h-[101.58px] pointer-events-auto">
-        <button
-          className="flex items-center justify-center"
-          style={{ opacity: workOpacity }}
+      {/* Date/Time en bas à gauche */}
+      {!workOpen && (
+        <div
+          className="absolute bottom-[10px] left-[10px] transition-opacity duration-300 pointer-events-none"
+          style={{ opacity: dateBottomOpacity * (1 - bottomFade) }}
         >
-          <p className="font-['Roboto:ExtraBold',sans-serif] font-extrabold leading-[normal] text-[20px] text-white tracking-[-0.2px] whitespace-nowrap" style={{ fontVariationSettings: '"wdth" 100' }}>
-            Work +
-          </p>
-        </button>
-        <button className="flex items-center justify-center" onClick={onMenuOpen}>
-          <p className="font-['Roboto:ExtraBold',sans-serif] font-extrabold leading-[normal] text-[20px] text-white tracking-[-0.2px] whitespace-nowrap" style={{ fontVariationSettings: '"wdth" 100' }}>
-            Menu +
-          </p>
-        </button>
+          <div className="flex flex-col items-start">
+            <p className="font-['Roboto:Regular',sans-serif] font-normal leading-[normal] text-[20px] text-white tracking-[-0.2px] whitespace-nowrap" style={{ fontVariationSettings: '"wdth" 100' }}>
+              {dateStr}
+            </p>
+            <p className="font-['Roboto:Regular',sans-serif] font-normal leading-[normal] text-[20px] text-white tracking-[-0.2px] whitespace-nowrap" style={{ fontVariationSettings: '"wdth" 100' }}>
+              {timeStr}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Menu + en haut à droite — visible au début (avant scroll) */}
+      {!workOpen && (
+        <div
+          className="absolute top-[10px] right-[10px] h-[101.58px] flex items-center justify-end transition-opacity duration-300 pointer-events-auto"
+          style={{ opacity: menuTopOpacity }}
+        >
+          <button className="flex items-center justify-center" onClick={onMenuOpen}>
+            <p className="font-['Roboto:ExtraBold',sans-serif] font-extrabold leading-[normal] text-[20px] text-white tracking-[-0.2px] whitespace-nowrap" style={{ fontVariationSettings: '"wdth" 100' }}>
+              Menu +
+            </p>
+          </button>
+        </div>
+      )}
+
+      {/* Header fixe — Work + et Menu + après scroll, ou boutons Work quand workOpen */}
+      <div className="absolute top-[10px] right-[10px] flex gap-[20px] items-center h-[101.58px] pointer-events-auto">
+        {workOpen ? (
+          /* Bouton fermer quand work est ouvert */
+          <button className="flex items-center justify-center" onClick={onWorkToggle}>
+            <p className="font-['Roboto:ExtraBold',sans-serif] font-extrabold leading-[normal] text-[20px] text-white tracking-[-0.2px] whitespace-nowrap" style={{ fontVariationSettings: '"wdth" 100' }}>
+              Fermer
+            </p>
+          </button>
+        ) : (
+          <>
+            <button
+              className="flex items-center justify-center"
+              style={{ opacity: workOpacity }}
+              onClick={onWorkToggle}
+            >
+              <p className="font-['Roboto:ExtraBold',sans-serif] font-extrabold leading-[normal] text-[20px] text-white tracking-[-0.2px] whitespace-nowrap" style={{ fontVariationSettings: '"wdth" 100' }}>
+                Work +
+              </p>
+            </button>
+            <button className="flex items-center justify-center" onClick={onMenuOpen}>
+              <p className="font-['Roboto:ExtraBold',sans-serif] font-extrabold leading-[normal] text-[20px] text-white tracking-[-0.2px] whitespace-nowrap" style={{ fontVariationSettings: '"wdth" 100' }}>
+                Menu +
+              </p>
+            </button>
+          </>
+        )}
       </div>
     </div>
   );

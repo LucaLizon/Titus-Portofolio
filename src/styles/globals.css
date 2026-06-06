@@ -1,3 +1,12 @@
+@keyframes workSlideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+.work-slide-in {
+  animation: workSlideIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
 @keyframes menuFadeIn {
   from { opacity: 0; backdrop-filter: blur(0px); }
   to   { opacity: 1; backdrop-filter: blur(14px); }
