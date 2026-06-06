@@ -37,12 +37,13 @@ export function AnimatedHeader({ scrollY, heroHeight }: AnimatedHeaderProps) {
     <div className="fixed top-0 left-0 right-0 z-50 w-full max-w-[402px] mx-auto h-screen pointer-events-none">
       {/* Logo TH - se transforme du centre vers le haut gauche */}
       <div
-        className="absolute transition-all duration-300 ease-out pointer-events-auto"
+        className="absolute pointer-events-auto"
         style={{
           left: `${logoLeft}px`,
           top: `${logoTop}px`,
           height: `${logoHeight}px`,
           width: `${logoWidth}px`,
+          willChange: 'top, height, width',
         }}
       >
         <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 200.999 244.74">

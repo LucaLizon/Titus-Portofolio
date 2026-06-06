@@ -12,16 +12,23 @@ export default function App() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    let rafId: number;
     const handleScroll = () => {
-      if (containerRef.current) {
-        setScrollY(containerRef.current.scrollTop);
-      }
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        if (containerRef.current) {
+          setScrollY(containerRef.current.scrollTop);
+        }
+      });
     };
 
     const container = containerRef.current;
     if (container) {
-      container.addEventListener('scroll', handleScroll);
-      return () => container.removeEventListener('scroll', handleScroll);
+      container.addEventListener('scroll', handleScroll, { passive: true });
+      return () => {
+        container.removeEventListener('scroll', handleScroll);
+        cancelAnimationFrame(rafId);
+      };
     }
   }, []);
 

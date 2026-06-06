@@ -14,10 +14,10 @@ export function FooterSection() {
                 <a className="block leading-[0] w-full hover:opacity-80 transition-opacity" href="tel:+33664396973" style={{ fontVariationSettings: '"wdth" 100' }}>
                   <p className="cursor-pointer leading-[normal]">+33 6 64 39 69 73</p>
                 </a>
-                <a className="block leading-[0] w-full hover:opacity-80 transition-opacity" href="https://linkedin.com" style={{ fontVariationSettings: '"wdth" 100' }} target="_blank">
+                <a className="block leading-[0] w-full hover:opacity-80 transition-opacity" href="https://www.linkedin.com/in/titus-hellouin-874723363/" style={{ fontVariationSettings: '"wdth" 100' }} target="_blank" rel="noopener noreferrer">
                   <p className="cursor-pointer leading-[normal]">+ Linkedin</p>
                 </a>
-                <a className="block leading-[0] w-full hover:opacity-80 transition-opacity" href="https://instagram.com" style={{ fontVariationSettings: '"wdth" 100' }} target="_blank">
+                <a className="block leading-[0] w-full hover:opacity-80 transition-opacity" href="https://www.instagram.com/fl4vivs/" style={{ fontVariationSettings: '"wdth" 100' }} target="_blank" rel="noopener noreferrer">
                   <p className="cursor-pointer leading-[normal]">+ Instagram</p>
                 </a>
               </div>
