@@ -27,16 +27,20 @@ import imgVuePasserelle03 from "../../imports/VTelephone4/Vue_passerelle_ext03.j
 import imgVueCouloir from "../../imports/VTelephone4/Vue_sur_le_couloir.jpg";
 import imgVueSallePoly from "../../imports/VTelephone4/Vue_sur_salle_poly_000.jpg";
 import imgVueVasque from "../../imports/VTelephone4/Vue_sur_vasque_parentale.jpg";
+
 const sources = [
   { src: imgA431, alt: "Architecture project" },
-  { src: imgCateringBanquetteEntree, alt: "Catering Banquette" },
-  { src: imgCateringDetailBanquette, alt: "Détail banquette" },
+  { src: imgCateringBanquetteACLentreue1, alt: "Catering Banquette entrée 1" },
+  { src: imgCateringBanquetteEntree, alt: "Catering Banquette entrée 2" },
+  { src: imgCateringDeutailBanquette1, alt: "Détail banquette 1" },
+  { src: imgCateringDetailBanquette, alt: "Détail banquette 2" },
   { src: imgCateringDetailCuisine, alt: "Détail cuisine" },
   { src: imgCateringCuisineVue, alt: "Cuisine vue ensemble" },
   { src: img3DZoneRestauration, alt: "Zone restauration" },
   { src: imgA43, alt: "Projet A4.3" },
   { src: imgSalleDeBain, alt: "Salle de bain" },
-  { src: imgChambre, alt: "Chambre" },
+  { src: imgImage02Chambre1, alt: "Chambre 1" },
+  { src: imgChambre, alt: "Chambre 2" },
   { src: img3DSequence01, alt: "Séquence 01" },
   { src: img3DSequence02, alt: "Séquence 02" },
   { src: img3DSequence03, alt: "Séquence 03" },
@@ -46,6 +50,7 @@ const sources = [
   { src: imgSDBParentale02, alt: "SDB parentale 02" },
   { src: imgSDBParentale000, alt: "SDB parentale" },
   { src: imgSuiteParentale, alt: "Suite parentale" },
+  { src: imgVuePasserelleExt011, alt: "Passerelle ext 1" },
   { src: imgVuePasserelle01, alt: "Passerelle 01" },
   { src: imgVuePasserelle02, alt: "Passerelle 02" },
   { src: imgVuePasserelle03, alt: "Passerelle 03" },
@@ -54,7 +59,7 @@ const sources = [
   { src: imgVueVasque, alt: "Vue vasque parentale" },
 ];
 
-// --- PRNG déterministe (mulberry32) : aléatoire mais reproductible ---
+// PRNG déterministe (mulberry32)
 function makeRng(seed: number) {
   return function () {
     seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
@@ -64,29 +69,41 @@ function makeRng(seed: number) {
   };
 }
 
-const CANVAS_W = 402;   // largeur de la toile (frame mobile)
-const SEED = 7;         // change ce chiffre pour une autre disposition
+const CANVAS_W = 402;
+const SEED = 42;
 
 function buildLayout() {
   const rng = makeRng(SEED);
   const rand = (min: number, max: number) => min + rng() * (max - min);
 
-  let y = 60;
-  return sources.map((img, i) => {
-    // taille aléatoire
-    const w = Math.round(rand(150, 230));
-    const h = Math.round(w * rand(0.75, 1.05)); // ratio varié
+  // Shuffle Fisher-Yates
+  const shuffled = [...sources];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
 
-    // débordement volontaire contrôlé : un peu hors-cadre à gauche/droite parfois
-    const overflow = rand(-40, 40);
+  // 2 lanes staggerées — la droite commence plus bas pour éviter le cluster du départ
+  const laneX = [90, 280] as const;          // centres X des 2 lanes
+  const laneY = [30, 140] as number[];       // stagger initial: droite décalée de 110px
+
+  return shuffled.map((img, i) => {
+    const w = Math.round(rand(150, 230));
+    const h = Math.round(w * rand(0.72, 1.15));
+
+    // Gravity: remplit toujours la lane la moins avancée
+    const lane = laneY[0] <= laneY[1] ? 0 : 1;
+
+    // X centré sur la lane avec variation ±45px
     const left = Math.round(
-      Math.max(-50, Math.min(CANVAS_W - w + 50, rand(-30, CANVAS_W - w + 30) + overflow))
+      Math.max(-20, Math.min(CANVAS_W - w + 20,
+        laneX[lane] - w / 2 + rand(-45, 45)
+      ))
     );
 
-    // avancement vertical irrégulier : parfois chevauchement (négatif), parfois espace
-    const step = rand(-60, 150);
-    const top = Math.round(y + step);
-    y = top + h * rand(0.45, 0.75); // densité du flux
+    const top = Math.round(laneY[lane] + rand(0, 30));
+
+    laneY[lane] = top + h + Math.round(rand(35, 70));
 
     return {
       id: `img${i}`,
@@ -94,7 +111,7 @@ function buildLayout() {
       width: w,
       height: h,
       position: { top: Math.max(0, top), left },
-      z: Math.floor(rng() * 100), // ordre de superposition aléatoire
+      z: Math.floor(rng() * 100),
     };
   });
 }
