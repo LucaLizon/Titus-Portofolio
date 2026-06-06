@@ -88,7 +88,7 @@ function buildLayout() {
   const laneY = [30, 140] as number[];       // stagger initial: droite décalée de 110px
 
   return shuffled.map((img, i) => {
-    const w = Math.round(rand(150, 230));
+    const w = Math.round(rand(180, 276)); // +20%
     const h = Math.round(w * rand(0.72, 1.15));
 
     // Gravity: remplit toujours la lane la moins avancée
