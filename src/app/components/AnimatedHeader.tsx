@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import svgPathsLarge from "../../imports/VTelephone1/svg-81nbe11cn7";
 
 interface AnimatedHeaderProps {
@@ -5,7 +6,24 @@ interface AnimatedHeaderProps {
   heroHeight: number;
 }
 
+function useNow() {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);
+  }, []);
+  return now;
+}
+
+function pad(n: number) {
+  return String(n).padStart(2, '0');
+}
+
 export function AnimatedHeader({ scrollY, heroHeight }: AnimatedHeaderProps) {
+  const now = useNow();
+  const dateStr = `${pad(now.getDate())} ${pad(now.getMonth() + 1)}`;
+  const timeStr = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+
   // Animation plus rapide - se termine à 70% du scroll au lieu de 100%
   const animationEndPoint = heroHeight * 0.7;
   const progress = Math.min(scrollY / animationEndPoint, 1);
@@ -63,10 +81,10 @@ export function AnimatedHeader({ scrollY, heroHeight }: AnimatedHeaderProps) {
         <div className="flex-none rotate-90">
           <div className="flex flex-col items-start justify-center">
             <p className="font-['Roboto:Regular',sans-serif] font-normal leading-[normal] text-[20px] text-white tracking-[-0.2px] whitespace-nowrap" style={{ fontVariationSettings: '"wdth" 100' }}>
-              02 06
+              {dateStr}
             </p>
             <p className="font-['Roboto:Regular',sans-serif] font-normal leading-[normal] text-[20px] text-white tracking-[-0.2px] whitespace-nowrap" style={{ fontVariationSettings: '"wdth" 100' }}>
-              16:52:36
+              {timeStr}
             </p>
           </div>
         </div>
