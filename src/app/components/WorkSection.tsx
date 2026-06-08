@@ -136,7 +136,8 @@ export function WorkSection({ closing }: WorkSectionProps) {
 
   return (
     <div className={`${closing ? 'work-slide-out' : 'work-slide-in'} fixed inset-0 z-[100] bg-black overflow-y-auto`}>
-      <div className="pt-[110px] pb-[80px] max-w-[402px] mx-auto px-[20px]">
+      {/* pt: place la barre du haut (border-t du 1er projet) ~10px sous le bas du logo TH (10px + 81.58px) */}
+      <div className="pt-[102px] pb-[80px] max-w-[402px] mx-auto px-[20px]">
 
         {/* Liste des projets */}
         <div className="flex flex-col">
@@ -196,7 +197,7 @@ export function WorkSection({ closing }: WorkSectionProps) {
                         {project.images.map((img, i) => (
                           <div
                             key={i}
-                            className="shrink-0 w-[230px] h-[160px] overflow-hidden snap-start"
+                            className="shrink-0 w-[345px] h-[240px] overflow-hidden snap-start"
                           >
                             <img src={img.src} alt={img.alt} className="w-full h-full object-cover" loading="lazy" />
                           </div>
