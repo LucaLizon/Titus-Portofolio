@@ -12,8 +12,19 @@ export default function App() {
   const [scrollY, setScrollY] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [workOpen, setWorkOpen] = useState(false);
+  // Reste monté pendant l'animation de fermeture (slide-out) avant de disparaître du DOM
+  const [workMounted, setWorkMounted] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const bottomSectionRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (workOpen) {
+      setWorkMounted(true);
+    } else if (workMounted) {
+      const timer = setTimeout(() => setWorkMounted(false), 400);
+      return () => clearTimeout(timer);
+    }
+  }, [workOpen, workMounted]);
 
   useEffect(() => {
     let rafId: number;
@@ -37,11 +48,17 @@ export default function App() {
   }, []);
 
   // Fade du header (TH + heure) quand la section basse entre dans le viewport
-  const bottomTop = bottomSectionRef.current?.offsetTop ?? Infinity;
-  const fadeStart = bottomTop - 280;
-  const fadeEnd = bottomTop - 80;
-  const rawFade = (scrollY - fadeStart) / (fadeEnd - fadeStart);
-  const bottomFade = Math.max(0, Math.min(1, rawFade)); // 0 = visible, 1 = invisible
+  // bottomTop est `undefined` tant que le ref n'est pas attaché (premier rendu) :
+  // on garde alors bottomFade à 0 plutôt que de calculer un NaN (qui ferait ignorer
+  // l'opacité par le navigateur et afficherait brièvement la date/heure du haut).
+  const bottomTop = bottomSectionRef.current?.offsetTop;
+  let bottomFade = 0; // 0 = visible, 1 = invisible
+  if (bottomTop !== undefined) {
+    const fadeStart = bottomTop - 280;
+    const fadeEnd = bottomTop - 80;
+    const rawFade = (scrollY - fadeStart) / (fadeEnd - fadeStart);
+    bottomFade = Math.max(0, Math.min(1, rawFade));
+  }
 
   return (
     <>
@@ -61,8 +78,8 @@ export default function App() {
         </div>
       )}
 
-      {/* Section Work */}
-      {workOpen && <WorkSection onClose={() => setWorkOpen(false)} />}
+      {/* Section Work — reste montée pendant le slide-out */}
+      {workMounted && <WorkSection closing={!workOpen} />}
 
       <div ref={containerRef} className="bg-black h-screen w-full overflow-y-auto overflow-x-hidden">
         <AnimatedHeader

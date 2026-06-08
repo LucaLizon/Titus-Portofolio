@@ -1,5 +1,23 @@
 import { useState } from "react";
 
+import imgCateringBanquetteEntree from "../../imports/VTelephone4/Catering__Banquette_a___l_entre__e.jpg";
+import imgCateringDetailBanquette from "../../imports/VTelephone4/Catering__De__tail_banquette.jpg";
+import imgCateringDetailCuisine from "../../imports/VTelephone4/Catering__Detail_cuisine.jpg";
+import imgCateringCuisineVue from "../../imports/VTelephone4/Catering_Cuisine_vue_d_ensemble.jpg";
+import img3DZoneRestauration from "../../imports/VTelephone4/3D_Zone-restauration.PNG";
+import imgA43 from "../../imports/VTelephone4/A4.3.png";
+import imgA4 from "../../imports/VTelephone4/2a2a2de204eab3316c33b7556486073ff120da1f.png";
+import imgSalleDeBain from "../../imports/VTelephone4/Image01_Salle-de-bain.jpg";
+import imgChambre from "../../imports/VTelephone4/Image02-Chambre.png";
+import img3DSequence01 from "../../imports/VTelephone4/3D_Se__quence01.png";
+import img3DSequence02 from "../../imports/VTelephone4/3D_Se__quence02.png";
+import img3DSequence03 from "../../imports/VTelephone4/3D_Se__quence03.png";
+
+interface ProjectImage {
+  src: string;
+  alt: string;
+}
+
 interface Project {
   number: string;
   title: string;
@@ -9,6 +27,7 @@ interface Project {
   references?: string;
   materials?: string;
   tools?: string[];
+  images?: ProjectImage[];
 }
 
 const PROJECTS: Project[] = [
@@ -28,6 +47,10 @@ const PROJECTS: Project[] = [
     description: "CHAMBRE LOFT est un projet qui consiste à créer un espace de ±40 m² soumis à un grand nombre de contraintes. Une contrainte supplémentaire a été ajoutée : effectuer ce projet selon un axe de biais afin d'optimiser l'apport de lumière grâce aux fenêtres et aux briques de verre.",
     concept: "L'axe en biais permet d'intégrer chaque élément du programme — chambre, dressing, salle de bain, toilettes, salle de yoga — tout en exploitant les grandes baies vitrées de la façade, de la manière la plus harmonieuse possible.",
     tools: ["SketchUp", "Enscape"],
+    images: [
+      { src: imgSalleDeBain, alt: "Chambre Loft — salle de bain" },
+      { src: imgChambre, alt: "Chambre Loft — chambre" },
+    ],
   },
   {
     number: "03",
@@ -37,6 +60,12 @@ const PROJECTS: Project[] = [
     concept: "Plans et coupes à l'échelle 1/20e avec détails 1/5e. Cuisine entièrement équipée, espace banquette, hall d'accueil et zone restauration repensés dans une esthétique Japandi — matériaux naturels, lignes épurées, sobriété.",
     materials: "Stratifié HPL — ABET LAMINATI Olmo Fine · Granit 2 cm — EASYPLAN Vert San Francisco, finition polie · Évier FRANKE Mythos · Électroménager MIELE · BLUM charnières noir onyx, tiroir Movento",
     tools: ["SketchUp", "Enscape"],
+    images: [
+      { src: imgCateringBanquetteEntree, alt: "Botanique — catering, banquette à l'entrée" },
+      { src: imgCateringDetailBanquette, alt: "Botanique — détail banquette" },
+      { src: imgCateringDetailCuisine, alt: "Botanique — détail cuisine" },
+      { src: imgCateringCuisineVue, alt: "Botanique — cuisine, vue d'ensemble" },
+    ],
   },
   {
     number: "04",
@@ -45,6 +74,11 @@ const PROJECTS: Project[] = [
     description: "BRUXELLES URBAIN est un projet d'aménagement de l'hôtel « La Grande Cloche » place Rouppe, Bruxelles. Plusieurs interventions urbanistiques sont pensées pour transformer la place : espaces verts, optimisation de la mobilité, espaces de détente.",
     concept: "Aménagement hôtelier complet — hall, restauration, catering — associé à une réflexion sur la transformation urbaine de la place Rouppe. Plans AutoCAD, texturages Photoshop, modélisation et rendus photoréalistes.",
     tools: ["AutoCAD", "SketchUp", "Enscape", "Photoshop"],
+    images: [
+      { src: img3DZoneRestauration, alt: "Bruxelles Urbain — zone de restauration, rendu 3D" },
+      { src: imgA43, alt: "Bruxelles Urbain — planche A4.3" },
+      { src: imgA4, alt: "Bruxelles Urbain — planche A4" },
+    ],
   },
   {
     number: "05",
@@ -81,14 +115,19 @@ const PROJECTS: Project[] = [
     concept: "Identité graphique fondée sur le quadrilatère, déclinée en sous-marques : rose pour « Chacha » (chats), vert pour « Toutou » (chiens). Bouteilles en verre ambré, capsules bicolores, notices FR + IT. Comp. (complément alimentaire) + Ani. (animal).",
     materials: "Verre ambré · Capsules plastique noir mat · Étiquettes papier finition légèrement texturée",
     tools: ["InDesign", "Photoshop", "Blender", "After Effects"],
+    images: [
+      { src: img3DSequence01, alt: "Compani — séquence 3D 01" },
+      { src: img3DSequence02, alt: "Compani — séquence 3D 02" },
+      { src: img3DSequence03, alt: "Compani — séquence 3D 03" },
+    ],
   },
 ];
 
 interface WorkSectionProps {
-  onClose: () => void;
+  closing: boolean;
 }
 
-export function WorkSection({ onClose }: WorkSectionProps) {
+export function WorkSection({ closing }: WorkSectionProps) {
   const [openProject, setOpenProject] = useState<string | null>(null);
 
   const toggle = (num: string) => {
@@ -96,24 +135,8 @@ export function WorkSection({ onClose }: WorkSectionProps) {
   };
 
   return (
-    <div className="work-slide-in fixed inset-0 z-[100] bg-black overflow-y-auto">
+    <div className={`${closing ? 'work-slide-out' : 'work-slide-in'} fixed inset-0 z-[100] bg-black overflow-y-auto`}>
       <div className="pt-[110px] pb-[80px] max-w-[402px] mx-auto px-[20px]">
-
-        {/* En-tête de section */}
-        <div className="flex items-end justify-between mb-[40px]">
-          <p
-            className="font-['Roboto:ExtraBold',sans-serif] font-extrabold text-[13px] text-[#acacac] tracking-[-0.13px]"
-            style={{ fontVariationSettings: '"wdth" 100' }}
-          >
-            Work
-          </p>
-          <p
-            className="font-['Roboto:ExtraBold',sans-serif] font-extrabold text-[13px] text-[#acacac] tracking-[-0.13px]"
-            style={{ fontVariationSettings: '"wdth" 100' }}
-          >
-            {PROJECTS.length} projets
-          </p>
-        </div>
 
         {/* Liste des projets */}
         <div className="flex flex-col">
@@ -126,13 +149,7 @@ export function WorkSection({ onClose }: WorkSectionProps) {
                   className="w-full flex items-start justify-between py-[20px] gap-[12px] text-left group"
                   onClick={() => toggle(project.number)}
                 >
-                  <div className="flex items-start gap-[14px] flex-1 min-w-0">
-                    <span
-                      className="font-['Roboto:ExtraBold',sans-serif] font-extrabold text-[11px] text-[#555555] tracking-[-0.11px] mt-[3px] shrink-0 w-[20px]"
-                      style={{ fontVariationSettings: '"wdth" 100' }}
-                    >
-                      {project.number}
-                    </span>
+                  <div className="flex items-start flex-1 min-w-0">
                     <div className="flex flex-col gap-[3px] min-w-0">
                       <span
                         className="font-['Roboto:ExtraBold',sans-serif] font-extrabold text-[22px] text-white tracking-[-0.22px] leading-none group-hover:text-[#acacac] transition-colors duration-200"
@@ -159,12 +176,33 @@ export function WorkSection({ onClose }: WorkSectionProps) {
                   </span>
                 </button>
 
-                {/* Contenu expandable */}
+                {/* Contenu expandable — grid 0fr/1fr : s'adapte à la hauteur réelle du contenu, jamais de clipping */}
                 <div
-                  className="overflow-hidden transition-all duration-500 ease-in-out"
-                  style={{ maxHeight: isOpen ? '1200px' : '0px' }}
+                  className="grid"
+                  style={{
+                    gridTemplateRows: isOpen ? '1fr' : '0fr',
+                    transition: 'grid-template-rows 500ms ease-in-out',
+                  }}
                 >
+                  <div className="overflow-hidden min-h-0">
                   <div className="pb-[36px] flex flex-col gap-[24px]">
+
+                    {/* Photos du projet */}
+                    {project.images && project.images.length > 0 && (
+                      <div
+                        className="no-scrollbar flex gap-[10px] overflow-x-auto -mx-[20px] px-[20px] pb-[2px] snap-x snap-mandatory"
+                        style={{ scrollbarWidth: 'none' }}
+                      >
+                        {project.images.map((img, i) => (
+                          <div
+                            key={i}
+                            className="shrink-0 w-[230px] h-[160px] overflow-hidden snap-start"
+                          >
+                            <img src={img.src} alt={img.alt} className="w-full h-full object-cover" loading="lazy" />
+                          </div>
+                        ))}
+                      </div>
+                    )}
 
                     {/* Description */}
                     <p
@@ -251,6 +289,7 @@ export function WorkSection({ onClose }: WorkSectionProps) {
                       </div>
                     )}
 
+                  </div>
                   </div>
                 </div>
               </div>

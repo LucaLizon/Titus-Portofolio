@@ -38,8 +38,18 @@ export function AnimatedHeader({
   const timeStr = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
 
   const animationEndPoint = heroHeight * 0.7;
-  // Quand Work est ouvert, forcer progress=1 : logo toujours petit en haut-gauche
-  const progress = workOpen ? 1 : Math.min(scrollY / animationEndPoint, 1);
+
+  // Une fois l'animation terminée (logo en place en haut), elle reste figée :
+  // remonter ne doit pas la relancer — seul un rechargement de page la réinitialise.
+  const [animationDone, setAnimationDone] = useState(false);
+  useEffect(() => {
+    if (!animationDone && scrollY >= animationEndPoint) {
+      setAnimationDone(true);
+    }
+  }, [scrollY, animationDone, animationEndPoint]);
+
+  // Quand Work est ouvert ou l'animation déjà terminée : logo figé, petit, en haut-gauche
+  const progress = (workOpen || animationDone) ? 1 : Math.min(scrollY / animationEndPoint, 1);
 
   const startLogoHeight = 244.74;
   const endLogoHeight = 81.58;
@@ -56,10 +66,17 @@ export function AnimatedHeader({
   const dateHeaderOpacity = progress > 0.5 ? ((progress - 0.5) / 0.5) : 0;
   const dateBottomOpacity = progress < 0.5 ? (1 - progress * 2) : 0;
   const workOpacity = progress > 0.5 ? ((progress - 0.5) / 0.5) : 0;
-  const menuTopOpacity = progress < 0.2 ? (1 - progress * 5) : 0;
 
   // Logo cliquable uniquement quand il est petit
   const logoClickable = progress > 0.9 || workOpen;
+
+  // Position des boutons Work+/Menu+ : alignés sur le centre du logo TH une fois en place,
+  // puis glissent vers l'alignement avec le texte "Titus Hellouin" (bandeau de 52px, texte centré)
+  // à mesure que le header s'efface en approchant la section basse (piloté par bottomFade).
+  const logoCenterY = endTop + endLogoHeight / 2;
+  const nameBannerCenterY = 26;
+  const buttonCenterY = logoCenterY + bottomFade * (nameBannerCenterY - logoCenterY);
+  const buttonContainerTop = buttonCenterY - endLogoHeight / 2;
 
   // Fond noir sous le header uniquement dans la section Work
   const showBlackBg = workOpen;
@@ -107,10 +124,10 @@ export function AnimatedHeader({
       >
         <div className="flex-none rotate-90">
           <div className="flex flex-col items-start justify-center">
-            <p className="font-['Roboto:Regular',sans-serif] font-normal leading-[normal] text-[20px] text-white tracking-[-0.2px] whitespace-nowrap" style={{ fontVariationSettings: '"wdth" 100' }}>
+            <p className="font-['Roboto:ExtraBold',sans-serif] font-extrabold leading-[normal] text-[20px] text-white tracking-[-0.2px] whitespace-nowrap" style={{ fontVariationSettings: '"wdth" 100' }}>
               {dateStr}
             </p>
-            <p className="font-['Roboto:Regular',sans-serif] font-normal leading-[normal] text-[20px] text-white tracking-[-0.2px] whitespace-nowrap" style={{ fontVariationSettings: '"wdth" 100' }}>
+            <p className="font-['Roboto:ExtraBold',sans-serif] font-extrabold leading-[normal] text-[20px] text-white tracking-[-0.2px] whitespace-nowrap" style={{ fontVariationSettings: '"wdth" 100' }}>
               {timeStr}
             </p>
           </div>
@@ -124,32 +141,21 @@ export function AnimatedHeader({
           style={{ opacity: dateBottomOpacity * (1 - bottomFade) }}
         >
           <div className="flex flex-col items-start">
-            <p className="font-['Roboto:Regular',sans-serif] font-normal leading-[normal] text-[20px] text-white tracking-[-0.2px] whitespace-nowrap" style={{ fontVariationSettings: '"wdth" 100' }}>
+            <p className="font-['Roboto:ExtraBold',sans-serif] font-extrabold leading-[normal] text-[20px] text-white tracking-[-0.2px] whitespace-nowrap" style={{ fontVariationSettings: '"wdth" 100' }}>
               {dateStr}
             </p>
-            <p className="font-['Roboto:Regular',sans-serif] font-normal leading-[normal] text-[20px] text-white tracking-[-0.2px] whitespace-nowrap" style={{ fontVariationSettings: '"wdth" 100' }}>
+            <p className="font-['Roboto:ExtraBold',sans-serif] font-extrabold leading-[normal] text-[20px] text-white tracking-[-0.2px] whitespace-nowrap" style={{ fontVariationSettings: '"wdth" 100' }}>
               {timeStr}
             </p>
           </div>
         </div>
       )}
 
-      {/* Menu + en haut à droite — visible au début (avant scroll) */}
-      {!workOpen && (
-        <div
-          className="absolute top-[10px] right-[10px] h-[101.58px] flex items-center justify-end transition-opacity duration-300 pointer-events-auto"
-          style={{ opacity: menuTopOpacity }}
-        >
-          <button className="flex items-center justify-center" onClick={onMenuOpen}>
-            <p className="font-['Roboto:ExtraBold',sans-serif] font-extrabold leading-[normal] text-[20px] text-white tracking-[-0.2px] whitespace-nowrap" style={{ fontVariationSettings: '"wdth" 100' }}>
-              Menu +
-            </p>
-          </button>
-        </div>
-      )}
-
-      {/* Header fixe — Work + et Menu + après scroll, ou boutons Work quand workOpen */}
-      <div className="absolute top-[10px] right-[10px] flex gap-[20px] items-center h-[101.58px] pointer-events-auto">
+      {/* Boutons Work+ / Menu+ (ou Fermer) — alignés sur le logo TH, puis sur "Titus Hellouin" en bas de page */}
+      <div
+        className="absolute right-[10px] flex gap-[20px] items-center pointer-events-auto"
+        style={{ top: `${buttonContainerTop}px`, height: `${endLogoHeight}px` }}
+      >
         {workOpen ? (
           /* Bouton fermer quand work est ouvert */
           <button className="flex items-center justify-center" onClick={onWorkToggle}>
@@ -160,8 +166,8 @@ export function AnimatedHeader({
         ) : (
           <>
             <button
-              className="flex items-center justify-center"
-              style={{ opacity: workOpacity }}
+              className="flex items-center justify-center transition-opacity duration-300"
+              style={{ opacity: workOpacity, pointerEvents: workOpacity > 0.05 ? 'auto' : 'none' }}
               onClick={onWorkToggle}
             >
               <p className="font-['Roboto:ExtraBold',sans-serif] font-extrabold leading-[normal] text-[20px] text-white tracking-[-0.2px] whitespace-nowrap" style={{ fontVariationSettings: '"wdth" 100' }}>
