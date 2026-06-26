@@ -78,20 +78,34 @@ export function AnimatedHeader({
   const buttonCenterY = logoCenterY + bottomFade * (nameBannerCenterY - logoCenterY);
   const buttonContainerTop = buttonCenterY - endLogoHeight / 2;
 
-  // Fond noir sous le header uniquement dans la section Work
-  const showBlackBg = workOpen;
-
   return (
     // z-[120] : au-dessus du WorkSection (z-100) mais sous le MenuOverlay (z-200)
     <div className="fixed top-0 left-0 right-0 z-[120] w-full max-w-[402px] mx-auto h-screen pointer-events-none">
 
-      {/* Fond noir derrière le header */}
-      {showBlackBg && (
-        <div
-          className="absolute top-0 left-0 right-0 bg-black pointer-events-none transition-opacity duration-300"
-          style={{ height: '100px', opacity: workOpen ? 1 : Math.min(progress * 10, 1) }}
-        />
-      )}
+      {/* Fond noir derrière le header — toujours monté, il apparaît/disparaît en
+          fondu au même rythme que le slide du panneau Work (0,4s, même courbe). */}
+      <div
+        className="absolute top-0 left-0 right-0 bg-black pointer-events-none transition-opacity"
+        style={{
+          height: '102px',
+          opacity: workOpen ? 1 : 0,
+          transitionDuration: '400ms',
+          transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)',
+        }}
+      />
+      {/* Barre fine qui délimite en permanence le header du contenu dans Work.
+          Même style et même retrait (10px) que les barres entre projets ; à
+          scroll 0 elle se superpose à la barre du 1er projet (aucun doublon). */}
+      <div
+        className="absolute left-[10px] right-[10px] bg-[#222222] pointer-events-none transition-opacity"
+        style={{
+          top: '102px',
+          height: '1px',
+          opacity: workOpen ? 1 : 0,
+          transitionDuration: '400ms',
+          transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)',
+        }}
+      />
 
       {/* Logo TH — s'efface quand la section basse entre dans le viewport */}
       <div
