@@ -5,6 +5,7 @@
 
 .work-slide-in {
   animation: workSlideIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  will-change: transform, opacity;
 }
 
 @keyframes workSlideOut {
@@ -14,6 +15,7 @@
 
 .work-slide-out {
   animation: workSlideOut 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  will-change: transform, opacity;
 }
 
 .no-scrollbar::-webkit-scrollbar {
@@ -21,8 +23,13 @@
 }
 
 @keyframes menuFadeIn {
-  from { opacity: 0; backdrop-filter: blur(0px); }
-  to   { opacity: 1; backdrop-filter: blur(14px); }
+  from { opacity: 0; backdrop-filter: blur(0px); background-color: rgba(0, 0, 0, 0); }
+  to   { opacity: 1; backdrop-filter: blur(14px); background-color: rgba(0, 0, 0, 0.45); }
+}
+
+@keyframes menuFadeOut {
+  from { opacity: 1; backdrop-filter: blur(14px); background-color: rgba(0, 0, 0, 0.45); }
+  to   { opacity: 0; backdrop-filter: blur(0px); background-color: rgba(0, 0, 0, 0); }
 }
 
 @keyframes menuTextIn {
@@ -30,12 +37,26 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes menuTextOut {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(12px); }
+}
+
+/* Entrée et sortie de même durée (0,35s) pour une animation symétrique. */
 .menu-overlay {
   animation: menuFadeIn 0.35s ease-out forwards;
 }
 
+.menu-overlay-out {
+  animation: menuFadeOut 0.35s ease-in forwards;
+}
+
 .menu-text {
   animation: menuTextIn 0.4s ease-out 0.15s both;
+}
+
+.menu-text-out {
+  animation: menuTextOut 0.3s ease-in forwards;
 }
 
 @keyframes marquee {

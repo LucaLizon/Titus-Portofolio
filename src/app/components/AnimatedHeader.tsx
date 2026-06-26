@@ -5,6 +5,7 @@ interface AnimatedHeaderProps {
   scrollY: number;
   heroHeight: number;
   workOpen: boolean;
+  workMounted: boolean; // monté pendant toute l'animation d'ouverture/fermeture de Work
   bottomFade: number; // 0 = logo visible, 1 = logo invisible
   onScrollTop: () => void;
   onMenuOpen: () => void;
@@ -28,6 +29,7 @@ export function AnimatedHeader({
   scrollY,
   heroHeight,
   workOpen,
+  workMounted,
   bottomFade,
   onScrollTop,
   onMenuOpen,
@@ -82,30 +84,23 @@ export function AnimatedHeader({
     // z-[120] : au-dessus du WorkSection (z-100) mais sous le MenuOverlay (z-200)
     <div className="fixed top-0 left-0 right-0 z-[120] w-full max-w-[402px] mx-auto h-screen pointer-events-none">
 
-      {/* Fond noir derrière le header — toujours monté, il apparaît/disparaît en
-          fondu au même rythme que le slide du panneau Work (0,4s, même courbe). */}
-      <div
-        className="absolute top-0 left-0 right-0 bg-black pointer-events-none transition-opacity"
-        style={{
-          height: '102px',
-          opacity: workOpen ? 1 : 0,
-          transitionDuration: '400ms',
-          transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)',
-        }}
-      />
-      {/* Barre fine qui délimite en permanence le header du contenu dans Work.
-          Même style et même retrait (10px) que les barres entre projets ; à
-          scroll 0 elle se superpose à la barre du 1er projet (aucun doublon). */}
-      <div
-        className="absolute left-[10px] right-[10px] bg-[#222222] pointer-events-none transition-opacity"
-        style={{
-          top: '102px',
-          height: '1px',
-          opacity: workOpen ? 1 : 0,
-          transitionDuration: '400ms',
-          transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)',
-        }}
-      />
+      {/* Fond noir + barre de délimitation du header. Ils utilisent EXACTEMENT
+          la même animation que le panneau Work (work-slide-in/out) et restent
+          montés le temps de l'anim → ils glissent en parfaite synchro avec lui.
+          La barre fine reprend le style et le retrait (10px) des barres entre
+          projets ; à scroll 0 elle se superpose à celle du 1er projet. */}
+      {workMounted && (
+        <>
+          <div
+            className={`${workOpen ? 'work-slide-in' : 'work-slide-out'} absolute top-0 left-0 right-0 bg-black pointer-events-none`}
+            style={{ height: '102px' }}
+          />
+          <div
+            className={`${workOpen ? 'work-slide-in' : 'work-slide-out'} absolute left-[10px] right-[10px] bg-[#222222] pointer-events-none`}
+            style={{ top: '102px', height: '1px' }}
+          />
+        </>
+      )}
 
       {/* Logo TH — s'efface quand la section basse entre dans le viewport */}
       <div
@@ -174,7 +169,7 @@ export function AnimatedHeader({
           /* Bouton fermer quand work est ouvert */
           <button className="flex items-center justify-center" onClick={onWorkToggle}>
             <p className="font-['Roboto:ExtraBold',sans-serif] font-extrabold leading-[normal] text-[20px] text-white tracking-[-0.2px] whitespace-nowrap" style={{ fontVariationSettings: '"wdth" 100' }}>
-              Fermer
+              Close
             </p>
           </button>
         ) : (

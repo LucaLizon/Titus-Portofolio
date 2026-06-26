@@ -15,7 +15,7 @@ export function WorkSection({ closing }: WorkSectionProps) {
   };
 
   return (
-    <div className={`${closing ? 'work-slide-out' : 'work-slide-in'} fixed inset-0 z-[100] bg-black overflow-y-auto`}>
+    <div className={`${closing ? 'work-slide-out' : 'work-slide-in'} fixed inset-0 z-[100] bg-black overflow-y-auto overscroll-contain`}>
       {/* pt: place la barre du haut (border-t du 1er projet) ~10px sous le bas du logo TH (10px + 81.58px) */}
       <div className="pt-[102px] pb-[80px] max-w-[402px] mx-auto px-[10px]">
 

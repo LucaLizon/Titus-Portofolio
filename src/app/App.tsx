@@ -11,6 +11,8 @@ import { WorkSection } from "./components/WorkSection";
 export default function App() {
   const [scrollY, setScrollY] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
+  // Reste monté pendant l'animation de fermeture (fade-out) avant de disparaître du DOM
+  const [menuMounted, setMenuMounted] = useState(false);
   const [workOpen, setWorkOpen] = useState(false);
   // Reste monté pendant l'animation de fermeture (slide-out) avant de disparaître du DOM
   const [workMounted, setWorkMounted] = useState(false);
@@ -25,6 +27,16 @@ export default function App() {
       return () => clearTimeout(timer);
     }
   }, [workOpen, workMounted]);
+
+  // Même logique pour l'overlay menu : on le garde monté le temps du fade-out.
+  useEffect(() => {
+    if (menuOpen) {
+      setMenuMounted(true);
+    } else if (menuMounted) {
+      const timer = setTimeout(() => setMenuMounted(false), 350);
+      return () => clearTimeout(timer);
+    }
+  }, [menuOpen, menuMounted]);
 
   useEffect(() => {
     let rafId: number;
@@ -62,15 +74,14 @@ export default function App() {
 
   return (
     <>
-      {/* Overlay menu */}
-      {menuOpen && (
+      {/* Overlay menu — reste monté pendant le fade-out (animation symétrique). */}
+      {menuMounted && (
         <div
-          className="menu-overlay fixed inset-0 z-[200] flex items-center justify-center cursor-pointer"
-          style={{ backdropFilter: 'blur(14px)', backgroundColor: 'rgba(0,0,0,0.45)' }}
+          className={`${menuOpen ? 'menu-overlay' : 'menu-overlay-out'} fixed inset-0 z-[200] flex items-center justify-center cursor-pointer`}
           onClick={() => setMenuOpen(false)}
         >
           <p
-            className="menu-text font-['Roboto:ExtraBold',sans-serif] font-extrabold text-white text-[28px] tracking-[-0.28px] select-none"
+            className={`${menuOpen ? 'menu-text' : 'menu-text-out'} font-['Roboto:ExtraBold',sans-serif] font-extrabold text-white text-[28px] tracking-[-0.28px] select-none`}
             style={{ fontVariationSettings: '"wdth" 100' }}
           >
             Available soon
@@ -81,11 +92,12 @@ export default function App() {
       {/* Section Work — reste montée pendant le slide-out */}
       {workMounted && <WorkSection closing={!workOpen} />}
 
-      <div ref={containerRef} className="bg-black h-screen w-full overflow-y-auto overflow-x-hidden">
+      <div ref={containerRef} className="bg-black h-screen w-full overflow-y-auto overflow-x-hidden overscroll-y-contain">
         <AnimatedHeader
           scrollY={scrollY}
           heroHeight={874}
           workOpen={workOpen}
+          workMounted={workMounted}
           bottomFade={bottomFade}
           onScrollTop={() => {
             containerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
